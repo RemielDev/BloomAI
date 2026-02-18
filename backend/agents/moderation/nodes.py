@@ -224,7 +224,8 @@ class StartModeration:
             intent = result.output if hasattr(result, "output") else result
             return intent
         except Exception as e:
-            logger.error(f"Error in PII intent detection: {e}")
+            logger.error(f"PIIAgent FAILED: {e}", exc_info=True)
+            token_tracker.track("PIIAgent_ERROR", 0, 0)
             return False
     
     async def _check_content(self, content: str) -> ContentResult:
@@ -284,7 +285,8 @@ class StartModeration:
             return None
             
         except Exception as e:
-            logger.error(f"Error in AI action determination: {e}")
+            logger.error(f"ModAgent FAILED: {e}", exc_info=True)
+            token_tracker.track("ModAgent_ERROR", 0, 0)
             # Fallback to warning on error
             return ModAction(
                 action=ActionType.WARNING,

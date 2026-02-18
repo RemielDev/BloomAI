@@ -19,6 +19,7 @@ class TokenTracker:
         self._agents: Dict[str, Dict[str, int]] = defaultdict(
             lambda: {"input_tokens": 0, "output_tokens": 0, "requests": 0}
         )
+        self._debug_log: list = []
         self._start_time = time.time()
 
     def track(self, agent_name: str, input_tokens: int, output_tokens: int):
@@ -26,6 +27,7 @@ class TokenTracker:
             self._agents[agent_name]["input_tokens"] += input_tokens
             self._agents[agent_name]["output_tokens"] += output_tokens
             self._agents[agent_name]["requests"] += 1
+            self._debug_log.append(f"{agent_name}: in={input_tokens} out={output_tokens}")
         logger.info(
             f"Token usage [{agent_name}]: input={input_tokens}, output={output_tokens}"
         )
@@ -83,6 +85,7 @@ class TokenTracker:
                 "output_tokens": total_output,
                 "total_tokens": total_input + total_output,
                 "estimated_cost_usd": round(input_cost + output_cost, 8),
+                "debug": list(self._debug_log[-10:]),
             }
 
     def reset(self):

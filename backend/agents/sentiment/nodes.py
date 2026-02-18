@@ -7,6 +7,8 @@ import asyncio
 import os
 from dotenv import load_dotenv
 
+from services.token_tracker import token_tracker
+
 from .state import (
     SentimentAnalysisState,
     CommunityIntent,
@@ -172,6 +174,8 @@ class AnalyzeCommunityIntent(BaseNode[SentimentAnalysisState]):
             result = await CommunityIntentAgent.run(
                 ctx.state.chat_analysis.chat.content
             )
+            usage = result.usage()
+            token_tracker.track("CommunityIntentAgent", usage.input_tokens, usage.output_tokens)
             intent_result = result.output if hasattr(result, "output") else result
 
             # Ensure reason is None when intent is None

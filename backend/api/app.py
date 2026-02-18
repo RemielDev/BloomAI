@@ -18,6 +18,7 @@ import asyncio
 import time
 import threading
 from collections import defaultdict
+from services.token_tracker import token_tracker
 
 # Helper function to clean AI service response
 def clean_ai_response(response):
@@ -1246,4 +1247,15 @@ async def debug_database_data():
     except Exception as e:
         logger.error(f"Debug data error: {e}")
         return {"error": str(e)}
+
+@app.get("/api/token-usage")
+async def get_token_usage():
+    """Get accumulated Gemini API token usage and estimated costs"""
+    return token_tracker.get_stats()
+
+@app.post("/api/token-usage/reset")
+async def reset_token_usage(_: None = Depends(verify_api_key)):
+    """Reset token usage counters (requires API key)"""
+    token_tracker.reset()
+    return {"message": "Token usage counters reset"}
 
